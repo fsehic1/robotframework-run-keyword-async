@@ -83,6 +83,6 @@ class runKeywordAsync:
         from multiprocessing import Process
 
         q  = Queue()
-        th = Process(target=wrapped_f, args=(q,)+args)
+        th = Process(target=self.wrapped_f, args=(q,)+args)
         th.result_queue = q
         return th
