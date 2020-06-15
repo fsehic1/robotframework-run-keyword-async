@@ -73,6 +73,8 @@ class runKeywordAsync:
         return th
 
     def _threaded(self, keyword, *args):
+        global wrapped_f
+        
         from multiprocessing import Queue
         from multiprocessing import Process
 
