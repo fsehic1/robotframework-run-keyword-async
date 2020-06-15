@@ -4,6 +4,12 @@ import time
 from robot.libraries.BuiltIn import BuiltIn
 from robot.output.logger import LOGGER
 
+def wrapped_f(q, *args):
+    ''' Calls the decorated function and puts the result in a queue '''
+    LOGGER.unregister_xml_logger()
+    ret = BuiltIn().run_keyword(keyword, *args)
+    q.put(ret)
+
 class runKeywordAsync:
     def __init__(self):
         self._thread_pool = {}
@@ -71,18 +77,12 @@ class runKeywordAsync:
         th = Process(target=wrapped_f, args=(q,)+args, kwargs=kwargs)
         th.result_queue = q
         return th
-
-    def wrapped_f(q, *args):
-        ''' Calls the decorated function and puts the result in a queue '''
-        LOGGER.unregister_xml_logger()
-        ret = BuiltIn().run_keyword(keyword, *args)
-        q.put(ret)
     
     def _threaded(self, keyword, *args):        
         from multiprocessing import Queue
         from multiprocessing import Process
 
         q  = Queue()
-        th = Process(target=self.wrapped_f, args=(q,)+args)
+        th = Process(target=wrapped_f, args=(q,)+args)
         th.result_queue = q
         return th
