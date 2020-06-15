@@ -72,17 +72,15 @@ class runKeywordAsync:
         th.result_queue = q
         return th
 
-    def _threaded(self, keyword, *args):
-        global wrapped_f
-        
+    def wrapped_f(q, *args):
+        ''' Calls the decorated function and puts the result in a queue '''
+        LOGGER.unregister_xml_logger()
+        ret = BuiltIn().run_keyword(keyword, *args)
+        q.put(ret)
+    
+    def _threaded(self, keyword, *args):        
         from multiprocessing import Queue
         from multiprocessing import Process
-
-        def wrapped_f(q, *args):
-            ''' Calls the decorated function and puts the result in a queue '''
-            LOGGER.unregister_xml_logger()
-            ret = BuiltIn().run_keyword(keyword, *args)
-            q.put(ret)
 
         q  = Queue()
         th = Process(target=wrapped_f, args=(q,)+args)
